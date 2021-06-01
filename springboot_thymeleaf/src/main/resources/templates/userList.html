@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>Title</title>
+    </head>
+    <body>
+        <div th:replace="~{fragments/header :: header}"></div>
+        <h3>用户列表</h3>
+        <div><a href="userAdd.html" th:href="@{/toAdd}">添加用户</a></div>
+        <table border="1">
+            <tr>
+                <td>编号</td>
+                <td>用户名</td>
+                <td>密码</td>
+                <td>真实姓名</td>
+                <td>操作</td>
+            </tr>
+            <tr th:each="user : ${list}">
+                <td th:text="${user.id}"></td>
+                <td th:text="${user.username}"></td>
+                <td th:text="${user.password}"></td>
+                <td th:text="${user.name}"></td>
+                <td><a th:href="@{/delete(id=${user.id})}">删除</a>| <a href="userUpdate.html"
+                                                                      th:href="@{/findById(id=${user.id})}">修改</a></td>
+            </tr>
+        </table>
+        <div th:replace="~{fragments/footer :: footer}"></div>
+    </body>
+</html>

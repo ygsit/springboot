@@ -1,0 +1,24 @@
+spring:
+  #选择激活使用的配置文件
+  profiles:
+    active: dev
+
+  #数据库(mysql5.0版本)配置
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/springboot?useUnicode=true&characterEncoding=utf8
+    username: root
+    password: 123456
+
+  #Redis配置
+  redis:
+    host: 127.0.0.1
+    port: 6379
+
+
+#mybatis配置
+mybatis:
+  #配置别名
+  type-aliases-package: com.yu.domain
+  #加载Mybatis映射文件位置
+  mapper-locations: classpath:mapper/*Mapper.xml

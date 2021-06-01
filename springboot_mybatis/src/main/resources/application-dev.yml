@@ -1,0 +1,16 @@
+#开发环境
+server:
+  port: 8080
+
+environment: 开发环境
+
+person:
+  name: admin
+  age: 28
+
+logging:
+  #配置日志等级
+  level:
+    root: info
+    #配置打印SQL
+    com.yu: debug

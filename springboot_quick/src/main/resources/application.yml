@@ -1,0 +1,41 @@
+#普通数据的配置
+name: zhangsan
+
+
+#对象属性的配置
+person:
+  name: lisi
+  age: 18
+#对象属性行内样式的配置(不推荐)
+#person2: {name: zhangsan,age: 18}
+
+
+#普通数组集合的配置(普通字符串)
+city:
+  - beijing
+  - shanghai
+  - guangzhou
+  - shenzhen
+#普通数组集合的行内配置(普通字符串)(不推荐)
+#city2: [beijing,shanghai,guangzhou,shenzhen]
+
+
+#普通数组集合的配置(对象数据)
+student:
+  - name: tom
+    age: 20
+  - name: lily
+    age: 22
+#普通数组集合的行内配置(对象数据)(不推荐)
+student2: [{name: tom,age: 20},{name: lily,age: 22}]
+
+
+#Map配置
+map:
+  key1: value1
+  key2: value2
+
+
+#配置端口
+server:
+  port: 8090

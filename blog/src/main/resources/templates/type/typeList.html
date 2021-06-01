@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>分类管理</title>
+        <link rel="stylesheet" href="../../static/layui/css/layui.css" th:href="@{/layui/css/layui.css}">
+        <link rel="stylesheet" href="../../static/css/nav.css" th:href="@{/css/nav.css}">
+        <link rel="stylesheet" href="../../static/css/type.css" th:href="@{/css/type.css}">
+        <script src="../../static/layui/layui.js" th:src="@{/layui/layui.js}"></script>
+        <script src="../../static/js/jquery-1.12.4.min.js" th:src="@{/js/jquery-1.12.4.min.js}"></script>
+        <script src="../../static/js/nav.js" th:src="@{/js/nav.js}"></script>
+        <script src="../../static/js/type.js" th:src="@{/js/type.js}"></script>
+    </head>
+    <body>
+        <div th:replace="~{fragments/header :: header}"></div>
+
+
+        <!--正文部分-->
+        <div class="nav_2" th:if="${manager == null}">
+            <a th:href="@{/type/toTypeList}" class="nav_2_list">管理我的分类</a>
+            <bottom type="bottom" class="nav_2_add" onclick="addType()">新增分类</bottom>
+        </div>
+        <div class="layoutBody">
+            <div class="layui-container">
+                <div class="layui-row">
+                    <div class="demoTable">
+                        <form id="form" style="display: inline;">
+                            分类名
+                            <div class="layui-inline">
+                                <input class="layui-input" name="name" id="name">
+                            </div>
+                        </form>
+                        &nbsp;&nbsp;<button class="layui-btn" data-type="reload"><i class="layui-icon">&#xe615;</i>搜索
+                    </button>
+                        <button class="layui-btn layui-btn-danger" onclick="searchReset()"><i class="layui-icon">&#xe669;</i>重置
+                        </button>
+                    </div>
+                    <div style="float: right; margin-top: -40px" th:if="${manager != null}">
+                        <button class="layui-btn layui-btn-normal" onclick="showAddView()"><i
+                                class="layui-icon">&#xe654;</i>添加
+                        </button>
+                    </div>
+                </div>
+
+                <table class="layui-hide" id="typeList" lay-filter="typeList"></table>
+                <input type="hidden" th:value="${session.user.uid}" id="userId">
+                <input type="hidden" th:value="${manager}" id="isManger">
+            </div>
+
+            <!--新增分类窗口-->
+            <div id="addTypeView" style="display: none;">
+                <br>
+                <form class="layui-form" method="post">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">分类名</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="name" lay-verify="required|typeNameIsNotExist" placeholder="请输入博客分类名" class="layui-input biaodan">
+                        </div>
+                    </div>
+                    <br>
+
+                    <input type="hidden" name="uid" th:value="${session.user.uid}">
+
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <input type="submit" class="layui-btn" lay-submit lay-filter="typeAdd" value="立即添加"/>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+
+
+            <!--编辑分类窗口-->
+            <div id="editTypeView" style="display: none;">
+                <br>
+                <form class="layui-form" method="post" lay-filter="updateForm">
+                    <input type="hidden" name="tid">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">分类名</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="name" lay-verify="required|typeNameIsNotExist" placeholder="请输入博客分类名" class="layui-input biaodan">
+                        </div>
+                    </div>
+                    <br>
+
+                    <input type="hidden" name="uid" th:value="${session.user.uid}">
+
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <input type="submit" class="layui-btn" lay-submit lay-filter="typeEdit" value="立即修改"/>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+
+        <div th:replace="~{fragments/footer :: footer}"></div>
+
+
+        <script type="text/html" id="barDemo">
+            <a class="layui-btn layui-btn-mini" lay-event="edit">编辑</a>
+            <a class="layui-btn layui-btn-danger layui-btn-mini" lay-event="del">删除</a>
+        </script>
+
+        <script th:inline="none">
+            var uid = $("#userId").val();
+            var isManager = $("#isManger").val();
+            if(isManager != ""){
+                uid = "";
+                $("#typeManage").addClass('layui-this');
+            } else {
+                $("#type").addClass('layui-this');
+            }
+            layui.use(['table', 'element', 'form', 'layer'], function () {
+                var table = layui.table;
+                var element = layui.element;
+                var form = layui.form;
+                var layer = layui.layer;
+
+                //数据表格渲染
+                table.render({
+                    elem: '#typeList'
+                    , url: '/type/findAll?uid='+uid
+                    , cellMinWidth: 80
+                    , id: 'typeList'
+                    , cols: [[
+                        {align: 'center', title: '编号', type: 'numbers', width: 100}
+                        , {field: 'tid', title: 'ID', hide: true, align: 'center'}
+                        , {field: 'name', title: '分类名', sort: true, align: 'center'}
+                        , {field: 'username', title: '创建人', align: 'center'}
+                        , {field: 'createTime', title: '创建时间', align: 'center'}
+                        , {field: 'updateTime', title: '更新时间', align: 'center'}
+                        , {field: 'right', title: '操作', width: 180, align: 'center', toolbar: "#barDemo"}
+                    ]]
+                    , page: true
+                    , limits: [3, 5, 8, 10, 20] //控制多少行一页（默认五条一页）
+                    , limit: 5 //每页默认显示的数量
+                    , done: function (res, curr, count) {
+                        //如果是异步请求数据方式，res即为你接口返回的信息。
+                        //如果是直接赋值的方式，res即为：{data: [], count: 99} data为当前页数据、count为数据总长度
+                        console.log(res);
+                        //得到当前页码
+                        console.log(curr);
+                        //得到数据总量
+                        console.log(count);
+                    }
+
+                });
+
+
+                //监听操作按钮
+                table.on('tool(typeList)', function (obj) {
+                    var data = obj.data;
+                    console.log(data)
+                    if (obj.event === 'del') {
+                        layer.confirm('确定删除吗', function (index) {
+                            obj.del();
+                            layer.close(index);
+                            $.post("/type/deleteById", {"tid": data.tid}, function (result) {
+                                if(result == "false"){
+                                    layer.alert("存在此分类的博客，删除分类失败！")
+                                }
+                            });
+                            table.reload('typeList', {
+                                page: {
+                                    curr: 1 //重新从第 1 页开始
+                                }
+                            });
+                        });
+                    } else if (obj.event === 'edit') {
+                       //给表单赋初值
+                        form.val("updateForm", { //formTest 即 class="layui-form" 所在元素属性 lay-filter="" 对应的值
+                            "tid": data.tid,
+                            "name": data.name,
+                            "uid": data.uid
+                        });
+                        //让表单出现
+                        layer.open({
+                            type: 1,//类型
+                            area: ['400px', '220px'],//定义宽和高
+                            title: '编辑分类信息',//题目
+                            shadeClose: true,//点击遮罩层关闭
+                            content: $('#editTypeView')//打开的内容
+                        });
+                        //监听编辑用户信息
+                        form.on('submit(typeEdit)', function (data) {
+                            var json = data.field;
+                            console.log(json)
+                            $.post("/type/typeUpdate", {
+                                "tid": json.tid,
+                                "name": json.name
+                            }, function (result) {
+                                if(result == "false"){
+                                    alert("存在此分类的博客，编辑分类失败！")
+                                }
+                            })
+                            // table.reload();
+                        });
+                    }
+                });
+
+
+                //页面重载
+               var $ = layui.$, active = {
+                    reload: function () {
+                        var name = $('#name').val();
+                        //执行重载
+                        table.reload('typeList', {
+                            page: {
+                                curr: 1 //重新从第 1 页开始
+                            }
+                            , where: {
+                                name: name
+                            }
+                        });
+                    }
+                };
+                $('.demoTable .layui-btn').on('click', function () {
+                    var type = $(this).data('type');
+                    active[type] ? active[type].call(this) : '';
+                });
+
+
+                //监听添加用户
+                form.on('submit(typeAdd)', function(data){
+                    $.ajax({
+                        url:'/type/typeAdd',
+                        method:'post',
+                        data:data.field,
+                        dataType:'JSON',
+                        success:function(res){
+                            console.log(res);
+                        },
+                        error:function (res) {
+                            console.log("提交失败")
+                        }
+                    })
+                    table.reload();
+                });
+
+            })
+        </script>
+    </body>
+</html>

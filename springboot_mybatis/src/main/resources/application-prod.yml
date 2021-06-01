@@ -1,0 +1,9 @@
+#生产环境
+server:
+  port: 8088
+
+environment: 生产环境
+
+person:
+  name: yu
+  age: 20

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.blog.dao.TypeDao">
+
+    <!--查询所有分类-->
+    <select id="findAll" resultType="Type">
+        select
+          tid,
+          name,
+          uid,
+          DATE_FORMAT( createTime, '%Y-%m-%d %H:%i:%s' ) createTime,
+          DATE_FORMAT( updateTime, '%Y-%m-%d %H:%i:%s' ) updateTime
+        from
+          type
+    </select>
+
+    <!--查询总数-->
+    <select id="findCounts" resultType="java.lang.Integer">
+        select count(tid) from type
+    </select>
+
+    <!--查询某一个分类的数量-->
+    <select id="findNameCount" resultType="java.lang.Integer">
+        select
+          count(b.bid)
+        from
+          type t,
+          blog b
+        where
+          t.name = #{name}
+        AND
+          t.tid = b.tid
+    </select>
+
+    <!--查询首页5条分类的数量-->
+    <select id="findOnePage" resultType="Type">
+         select * from type limit 0, 5
+    </select>
+
+    <!--添加分类-->
+    <select id="typeAdd" parameterType="Type">
+        insert into type(name, uid, createTime, updateTime) values(#{name}, #{uid}, NOW(), NOW())
+    </select>
+
+    <!--判断分类名是否存在-->
+    <select id="typeNameIsExist" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(tid) from type where name = #{name}
+    </select>
+
+    <!--查询某一个人创建的分类-->
+    <select id="findAllByPage" resultType="Type" parameterType="java.util.Map">
+        select
+          tid,
+          name,
+          uid,
+          DATE_FORMAT(createTime, '%Y-%m-%d %H:%i:%s' ) createTime,
+          DATE_FORMAT(updateTime, '%Y-%m-%d %H:%i:%s' ) updateTime
+        from
+          type
+        <!-- where标签可以自动添加where，同时处理sql语句中第一个and关键字 -->
+        <where>
+            <if test="type.uid != null and type.uid != ''">
+                and uid = #{type.uid}
+            </if>
+            <if test="type.name != null and type.name != ''">
+                and name like '%${type.name}%'
+            </if>
+        </where>
+        limit #{begin}, #{limit}
+    </select>
+
+    <!--查询某一个人创建的分类数量-->
+    <select id="findCountsByUid" resultType="java.lang.Integer" parameterType="Type">
+        select
+          count(tid)
+        from
+          type
+        <!-- where标签可以自动添加where，同时处理sql语句中第一个and关键字,只能处理写在前面的and,无法去除掉后面的and关键字 -->
+        <where>
+            <if test="uid != null and uid != ''">
+                and uid = #{uid}
+            </if>
+            <if test="name != null and name != ''">
+                and name like '%${name}%'
+            </if>
+        </where>
+    </select>
+
+    <!--根据id删除-->
+    <delete id="deleteById" parameterType="integer">
+        delete from type where tid = #{tid}
+    </delete>
+
+    <!--修改分类-->
+    <update id="typeUpdate" parameterType="Type">
+        update
+          type
+        <trim prefix="set" suffixOverrides=",">
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="uid != null and uid != ''">
+                uid = #{uid}
+            </if>
+        </trim>
+        where tid = #{tid}
+    </update>
+
+</mapper>
